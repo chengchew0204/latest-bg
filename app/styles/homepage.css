@@ -1,0 +1,132 @@
+/* Homepage specific styles - Critical for preventing FOUC */
+
+
+
+/* Prevent layout shifts during loading */
+body {
+  overflow-x: hidden;
+}
+
+.main-content {
+  position: relative;
+  z-index: 1;
+  padding: 60px;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.main-text {
+  flex: 1;
+  max-width: 60%;
+  padding-right: 60px;
+}
+
+.main-text h1 {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #fff;
+  margin: 0 0 40px 0;
+}
+
+.main-text p {
+  color: #fff;
+  margin: 0;
+}
+
+.side-columns {
+  display: flex;
+  gap: 60px;
+  align-items: flex-start;
+}
+
+.column {
+  min-width: 120px;
+}
+
+.column h3 {
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  color: #fff;
+  margin: 0 0 20px 0;
+  opacity: 0.8;
+}
+
+.client-list,
+.contact-list {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #fff;
+  font-weight: 400;
+}
+
+.contact-list a {
+  color: #fff;
+  text-decoration: underline;
+  transition: opacity 0.3s ease;
+}
+
+.contact-list a:hover {
+  opacity: 0.7;
+}
+
+.backgroundWrapper {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+}
+
+.background-cover {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+#home {
+  position: relative;
+  min-height: 100vh;
+  opacity: 1;
+  transition: opacity 0.1s ease-in;
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .main-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 60px;
+    padding: 40px;
+  }
+  
+  .main-text {
+    max-width: 100%;
+    padding-right: 0;
+  }
+  
+  .main-text h1 {
+    font-size: 36px;
+  }
+  
+  .side-columns {
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 30px 20px;
+  }
+  
+  .main-text h1 {
+    font-size: 28px;
+  }
+  
+  .side-columns {
+    flex-direction: column;
+    gap: 30px;
+  }
+}

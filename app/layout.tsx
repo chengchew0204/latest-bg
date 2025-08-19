@@ -1,5 +1,6 @@
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./styles/buttons.css";
+import "./styles/homepage.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
