@@ -49,6 +49,7 @@ export async function POST(req: Request) {
       access: "public",
       contentType: "image/jpeg",
       addRandomSuffix: false, // keep deterministic path
+      allowOverwrite: true, // allow overwriting existing bg/current.jpg
     });
 
     // Write 2) private backup
