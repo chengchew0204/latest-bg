@@ -10,7 +10,11 @@ export default function Page() {
   // Initialize client-side state
   useEffect(() => {
     setIsClient(true);
-    setBgVersion(Date.now());
+    
+    // Check for stored version first, then use current time
+    const storedVersion = localStorage.getItem('bg-version');
+    const initialVersion = storedVersion ? parseInt(storedVersion, 10) : Date.now();
+    setBgVersion(initialVersion);
   }, []);
 
   // Check for background updates periodically
@@ -18,7 +22,10 @@ export default function Page() {
     if (!isClient) return;
 
     const checkForUpdates = () => {
-      setBgVersion(Date.now());
+      // Check localStorage for latest version
+      const storedVersion = localStorage.getItem('bg-version');
+      const newVersion = storedVersion ? parseInt(storedVersion, 10) : Date.now();
+      setBgVersion(newVersion);
     };
 
     // Update background when page becomes visible (user returns from photobooth)
@@ -28,10 +35,25 @@ export default function Page() {
       }
     };
 
+    // Also update on focus (when user clicks back to tab)
+    const handleFocus = () => {
+      checkForUpdates();
+    };
+
+    // Check for updates periodically (every 5 seconds when page is visible)
+    const interval = setInterval(() => {
+      if (!document.hidden) {
+        checkForUpdates();
+      }
+    }, 5000);
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
     };
   }, [isClient]);
 
