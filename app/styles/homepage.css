@@ -129,4 +129,8 @@ body {
     flex-direction: column;
     gap: 30px;
   }
+  
+  .subtitle-text {
+    top: 200px !important;
+  }
 }
