@@ -83,7 +83,7 @@ export default function Page() {
           {/* Left side - Main text */}
           <div className="main-text">
             <h1>Zack is a Dallas-based artist and coder working with lens-based media. </h1>
-            <p style={{ lineHeight: "25px", marginTop: "-30px" }}>His practice merges technology and moving image to capture scenes in ways that heighten reality. Alongside his independent work, he collaborates with clients across art and fashion. </p>
+            <p style={{ lineHeight: "25px", marginTop: "-30px" }}>His practice merges technology and moving image to capture scenes in ways that heighten reality. Alongside his independent work, he collaborates with clients across art and music. </p>
           </div>
           
           {/* Right side - Two columns */}

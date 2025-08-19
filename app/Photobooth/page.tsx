@@ -190,9 +190,11 @@ export default function PhotoboothPage() {
           <Button onClick={uploadPhoto} disabled={busy} className="btn--white-to-black">
             {uploadSuccess ? "Success!" : busy ? "Uploading..." : "Upload"}
           </Button>
-          <Button onClick={cancelPhoto} disabled={busy} className="btn--black-to-white">
-            Cancel
-          </Button>
+          {!busy && !uploadSuccess && (
+            <Button onClick={cancelPhoto} className="btn--black-to-white">
+              Cancel
+            </Button>
+          )}
         </div>
       )}
 
