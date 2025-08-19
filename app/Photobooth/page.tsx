@@ -4,12 +4,13 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 
 export default function PhotoboothPage() {
-  const [bgVersion, setBgVersion] = useState<number>(Date.now());
+  const [bgVersion, setBgVersion] = useState<number>(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -42,7 +43,7 @@ export default function PhotoboothPage() {
   }, [cameraActive]);
 
   // Stop camera to release resources
-  const stopCamera = () => {
+  const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     if (videoRef.current) {
@@ -51,13 +52,21 @@ export default function PhotoboothPage() {
     }
     setCameraActive(false);
     setCameraReady(false);
-  };
+  }, []);
 
+  // Initialize client-side state
   useEffect(() => {
-    // Auto-start camera when component mounts
+    setIsClient(true);
+    setBgVersion(Date.now());
+  }, []);
+
+  // Auto-start camera when client is ready
+  useEffect(() => {
+    if (!isClient) return;
+    
     startCamera();
     return () => stopCamera();
-  }, [startCamera]);
+  }, [isClient, startCamera, stopCamera]);
 
   // Capture a frame -> compress -> upload
   const captureAndUpload = async () => {

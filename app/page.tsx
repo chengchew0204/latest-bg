@@ -4,10 +4,19 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Page() {
-  const [bgVersion, setBgVersion] = useState<number>(Date.now());
+  const [bgVersion, setBgVersion] = useState<number>(0);
+  const [isClient, setIsClient] = useState(false);
+
+  // Initialize client-side state
+  useEffect(() => {
+    setIsClient(true);
+    setBgVersion(Date.now());
+  }, []);
 
   // Check for background updates periodically
   useEffect(() => {
+    if (!isClient) return;
+
     const checkForUpdates = () => {
       setBgVersion(Date.now());
     };
@@ -24,7 +33,7 @@ export default function Page() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [isClient]);
 
   return (
     <div>
