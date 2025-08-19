@@ -68,7 +68,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ ok: true, version });
-  } catch (err: any) {
-    return new NextResponse(err?.message ?? "Upload failed", { status: 500 });
+  } catch (err: unknown) {
+    return new NextResponse(err instanceof Error ? err.message : "Upload failed", { status: 500 });
   }
 }

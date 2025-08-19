@@ -20,8 +20,8 @@ export default function PhotoboothPage() {
       const v = videoRef.current!;
       v.srcObject = stream;
       await v.play();
-    } catch (e: any) {
-      setError(e?.message ?? "Camera permission denied");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Camera permission denied");
     }
   };
 
@@ -76,8 +76,8 @@ export default function PhotoboothPage() {
       // Bump version to bust cache on /bg
       const json = await res.json();
       setBgVersion(json.version ?? Date.now());
-    } catch (e: any) {
-      setError(e?.message ?? "Unknown error");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
       setBusy(false);
     }
