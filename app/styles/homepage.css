@@ -63,14 +63,19 @@ body {
   font-weight: 400;
 }
 
+.main-text a,
+.client-list a,
 .contact-list a {
   color: #fff;
   text-decoration: underline;
+  text-underline-offset: 4px;
   transition: opacity 0.3s ease;
 }
 
+.main-text a:hover,
+.client-list a:hover,
 .contact-list a:hover {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .backgroundWrapper {

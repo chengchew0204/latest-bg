@@ -82,7 +82,14 @@ export default function Page() {
         <div className="main-content">
           {/* Left side - Main text */}
           <div className="main-text">
-            <h1 style={{ marginBottom: "-50px" }}><span style={{ color: "red" }}>Zack Woo</span> is a Dallas-based artist/coder exploring systems, self-generating processes, and digital Autopoeisis through technology. </h1>
+            <h1 style={{ marginBottom: "-50px" }}><span style={{ color: "red" }}>Zack Woo</span> is a Dallas-based artist/coder exploring systems, self-generating processes, and <a
+                href="https://zenodo.org/records/15897903"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: 'underline', textUnderlineOffset: '2px' }}
+              >
+                digital Autopoiesis
+              </a> through technology. </h1>
             <h3 className="subtitle-text" style={{ position: "relative", top: "55px", maxWidth: "55vw", fontWeight: "350" }}>In addition to his independent work, he collaborates across art and music to create transformative experiences. </h3>
           </div>
           
