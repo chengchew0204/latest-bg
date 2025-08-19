@@ -7,21 +7,36 @@ export default function PhotoboothPage() {
   const [bgVersion, setBgVersion] = useState<number>(Date.now());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
   // Start camera
   const startCamera = async () => {
+    if (cameraActive) return; // Prevent multiple calls
+    
     setError(null);
+    setCameraActive(true);
+    setCameraReady(false);
+    
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       streamRef.current = stream;
       const v = videoRef.current!;
       v.srcObject = stream;
+      
+      // Wait for video to be ready
+      v.onloadedmetadata = () => {
+        setCameraReady(true);
+      };
+      
       await v.play();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Camera permission denied");
+      setCameraActive(false);
+      setCameraReady(false);
     }
   };
 
@@ -29,7 +44,12 @@ export default function PhotoboothPage() {
   const stopCamera = () => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
-    if (videoRef.current) videoRef.current.srcObject = null;
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+      videoRef.current.onloadedmetadata = null;
+    }
+    setCameraActive(false);
+    setCameraReady(false);
   };
 
   useEffect(() => {
@@ -44,7 +64,7 @@ export default function PhotoboothPage() {
     setError(null);
     try {
       const video = videoRef.current!;
-      if (!video || !video.videoWidth) {
+      if (!video || !cameraReady || !video.videoWidth) {
         throw new Error("Camera is not ready");
       }
 
@@ -104,8 +124,8 @@ export default function PhotoboothPage() {
 
       {/* Take photo button */}
       <div className="take-photo-button">
-        <button onClick={captureAndUpload} disabled={busy || !videoRef.current?.videoWidth}>
-          {busy ? "..." : "Take photo"}
+        <button onClick={captureAndUpload} disabled={busy || !cameraReady}>
+          {busy ? "..." : cameraReady ? "Take photo" : "Starting camera..."}
         </button>
       </div>
 
@@ -116,11 +136,17 @@ export default function PhotoboothPage() {
           playsInline
           muted
           className="camera-video"
-          onClick={startCamera}
+          onClick={!cameraActive ? startCamera : undefined}
+          style={{ display: cameraActive ? 'block' : 'none' }}
         />
-        {!videoRef.current?.videoWidth && (
+        {!cameraActive && (
           <div className="camera-placeholder" onClick={startCamera}>
             <span>Tap to start camera</span>
+          </div>
+        )}
+        {cameraActive && !cameraReady && (
+          <div className="camera-loading">
+            <span>Starting camera...</span>
           </div>
         )}
       </div>
@@ -220,6 +246,28 @@ export default function PhotoboothPage() {
           color: #fff;
           font-size: 24px;
           font-weight: 400;
+        }
+
+        .camera-loading {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0, 0, 0, 0.8);
+          z-index: 10;
+        }
+
+        .camera-loading span {
+          color: #fff;
+          font-size: 20px;
+          font-weight: 400;
+          animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
         }
 
         .error-overlay {
