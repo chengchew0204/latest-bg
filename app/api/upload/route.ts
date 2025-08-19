@@ -22,18 +22,27 @@ export async function POST(req: Request) {
     let img = sharp(input, { failOnError: false }).rotate();
     const meta = await img.metadata();
 
-    // Resize if too large
+    // For current background: resize and compress
+    let currentImg = img.clone();
     const MAX_W = 1920;
     if ((meta.width ?? 0) > MAX_W) {
-      img = img.resize({ width: MAX_W, withoutEnlargement: true });
+      currentImg = currentImg.resize({ width: MAX_W, withoutEnlargement: true });
     }
 
-    // Output as JPEG, strip metadata (no EXIF/GPS)
-    const jpeg = await img.jpeg({
+    // Output current as JPEG, strip metadata (no EXIF/GPS)
+    const jpeg = await currentImg.jpeg({
       quality: 82,
       progressive: true,
       chromaSubsampling: "4:2:0",
       mozjpeg: true,
+    }).toBuffer();
+
+    // For backup: keep original quality, only strip metadata
+    const backupBuffer = await img.jpeg({
+      quality: 100,        // Maximum quality
+      progressive: false,  // Disable progressive for maximum compatibility
+      chromaSubsampling: "4:4:4",  // Best chroma subsampling
+      mozjpeg: false,      // Use standard JPEG encoder for maximum quality
     }).toBuffer();
 
     // Generate version number (used as part of filename)
@@ -55,8 +64,8 @@ export async function POST(req: Request) {
       cacheControlMaxAge: 31536000,  // 1 year, since this URL will never change content
     });
 
-    // Write 2) backup (non-guessable URL, not exposed publicly)
-    await put(backupPath, jpeg, {
+    // Write 2) backup (non-guessable URL, not exposed publicly, maximum quality)
+    await put(backupPath, backupBuffer, {
       access: "public",
       addRandomSuffix: true,
       contentType: "image/jpeg",
