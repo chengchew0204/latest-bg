@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 
 export default function PhotoboothPage() {
   const [bgVersion, setBgVersion] = useState<number>(0);
@@ -170,31 +170,29 @@ export default function PhotoboothPage() {
         }}
       />
 
-      {/* Back button */}
-      <div className="back-button">
-        <Link href="/">Back</Link>
-      </div>
-
-      {/* Take photo button (only when not taken) */}
-      {!photoTaken && (
-        <div className="take-photo-button">
-          <button onClick={takePhoto} disabled={!cameraReady}>
-            Take photo
-          </button>
+      {/* Navigation header */}
+      <header className="photobooth-nav-wrapper">
+        <Button as="a" href="/">
+          Back
+        </Button>
+        <div className="right-wrapper">
+          {!photoTaken && (
+            <Button onClick={takePhoto} disabled={!cameraReady}>
+              Take photo
+            </Button>
+          )}
         </div>
-      )}
+      </header>
 
-      {/* Upload/Cancel buttons overlay (only when photo taken) */}
+      {/* Upload/Cancel buttons (only when photo taken) */}
       {photoTaken && (
-        <div className="photo-actions-overlay">
-          <div className="action-buttons">
-            <button onClick={uploadPhoto} disabled={busy} className="upload-btn">
-              {uploadSuccess ? "Success! Redirecting..." : busy ? "Uploading..." : "Upload"}
-            </button>
-            <button onClick={cancelPhoto} disabled={busy} className="cancel-btn">
-              Cancel
-            </button>
-          </div>
+        <div className="photo-actions-buttons">
+          <Button onClick={uploadPhoto} disabled={busy}>
+            {uploadSuccess ? "Success!" : busy ? "Uploading..." : "Upload"}
+          </Button>
+          <Button onClick={cancelPhoto} disabled={busy} className="btn--white">
+            Cancel
+          </Button>
         </div>
       )}
 
@@ -212,7 +210,6 @@ export default function PhotoboothPage() {
         />
         {!cameraReady && !photoTaken && (
           <div className="camera-loading">
-            <span>Loading...</span>
           </div>
         )}
       </div>
@@ -231,103 +228,28 @@ export default function PhotoboothPage() {
           overflow: hidden;
         }
 
-        .back-button {
+        /* DEPRECATED: Old button styles - replaced with .btn system */
+        /*
+        .back-button { ... }
+        .back-button a { ... }
+        .take-photo-button { ... }
+        .take-photo-button button { ... }
+        */
+
+        .photo-actions-buttons {
           position: fixed;
-          top: 30px;
-          left: 30px;
-          z-index: 100;
-        }
-
-        .back-button a {
-          color: #fff;
-          text-decoration: none;
-          font-size: 18px;
-          font-weight: 700;
-          transition: opacity 0.3s ease;
-        }
-
-        .back-button a:hover {
-          opacity: 0.7;
-        }
-
-        .take-photo-button {
-          position: fixed;
-          top: 30px;
-          right: 30px;
-          z-index: 100;
-        }
-
-        .take-photo-button button {
-          color: #fff;
-          background: rgba(0, 0, 0, 0.8);
-          border: none;
-          border-radius: 25px;
-          padding: 12px 24px;
-          font-size: 18px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .take-photo-button button:hover:not(:disabled) {
-          background: rgba(0, 0, 0, 0.9);
-        }
-
-        .take-photo-button button:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        .photo-actions-overlay {
-          position: fixed;
-          inset: 0;
+          top: 32px;
+          right: 32px;
+          z-index: 1000;
           display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 100;
-          background: rgba(0, 0, 0, 0.3);
+          gap: 12px;
         }
 
-        .action-buttons {
-          display: flex;
-          gap: 20px;
-          padding: 20px;
-          background: rgba(0, 0, 0, 0.7);
-          border-radius: 15px;
-          backdrop-filter: blur(10px);
-        }
-
-        .upload-btn, .cancel-btn {
-          color: #fff;
-          border: none;
-          border-radius: 25px;
-          padding: 12px 24px;
-          font-size: 18px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .upload-btn {
-          background: rgba(0, 150, 0, 0.8);
-        }
-
-        .upload-btn:hover:not(:disabled) {
-          background: rgba(0, 150, 0, 0.9);
-        }
-
-        .cancel-btn {
-          background: rgba(150, 0, 0, 0.8);
-        }
-
-        .cancel-btn:hover:not(:disabled) {
-          background: rgba(150, 0, 0, 0.9);
-        }
-
-        .upload-btn:disabled, .cancel-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
+        /* DEPRECATED: Old upload/cancel button styles - now using .btn system */
+        /*
+        .upload-btn { ... }
+        .cancel-btn { ... }
+        */
 
         .camera-container {
           position: absolute;
@@ -371,15 +293,8 @@ export default function PhotoboothPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba(0, 0, 0, 0.8);
+          background: #fff;
           z-index: 10;
-        }
-
-        .camera-loading span {
-          color: #fff;
-          font-size: 20px;
-          font-weight: 400;
-          animation: pulse 1.5s ease-in-out infinite;
         }
 
         .photo-preview {
@@ -397,55 +312,55 @@ export default function PhotoboothPage() {
           object-fit: contain;
         }
 
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
+
 
         .error-overlay {
           position: fixed;
-          bottom: 30px;
+          bottom: 32px;
           left: 50%;
           transform: translateX(-50%);
-          background: rgba(255, 0, 0, 0.9);
+          background: #000;
           color: #fff;
-          padding: 12px 24px;
-          border-radius: 8px;
+          border: 1px solid #fff;
+          border-radius: 0;
+          padding: 16px 32px;
           font-size: 14px;
+          font-weight: 400;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
           z-index: 100;
+          min-width: 200px;
+          text-align: center;
         }
 
         @media (max-width: 768px) {
-          .back-button,
-          .take-photo-button,
-          .action-buttons {
+          /* DEPRECATED: Old button responsive styles */
+          /*
+          .back-button { ... }
+          .take-photo-button { ... }
+          */
+          
+          .photo-actions-buttons {
             top: 20px;
-          }
-          
-          .back-button {
-            left: 20px;
-          }
-          
-          .take-photo-button,
-          .action-buttons {
             right: 20px;
-          }
-          
-          .action-buttons {
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
           }
           
-          .back-button a,
-          .take-photo-button button,
-          .upload-btn,
-          .cancel-btn {
-            font-size: 16px;
-            padding: 10px 20px;
-          }
+          /* DEPRECATED: Old upload/cancel responsive styles */
+          /*
+          .upload-btn, .cancel-btn { ... }
+          */
           
           .camera-loading span {
-            font-size: 18px;
+            font-size: 14px;
+          }
+          
+          .error-overlay {
+            bottom: 20px;
+            padding: 14px 28px;
+            min-width: 180px;
+            font-size: 13px;
           }
         }
       `}</style>

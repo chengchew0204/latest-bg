@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 
 export default function Page() {
   const [bgVersion, setBgVersion] = useState<number>(0);
@@ -61,9 +61,9 @@ export default function Page() {
     <div>
       <div id="home">
         {/* Submit background image button */}
-        <div className="submit-button">
-          <Link href="/Photobooth">Submit background image</Link>
-        </div>
+        <Button as="a" href="/Photobooth" className="btn--fixed-top-right">
+          Submit background image
+        </Button>
 
         {/* Main content */}
         <div className="main-content">
@@ -114,36 +114,16 @@ export default function Page() {
         </div>
       </div>
 
-      <style jsx>{`
-        .submit-button {
-          position: fixed;
-          top: 30px;
-          right: 30px;
-          z-index: 100;
-        }
-
-        .submit-button a {
-          color: #fff;
-          text-decoration: none;
-          padding: 12px 24px;
-          border: 1px solid rgba(255, 255, 255, 0.4);
-          border-radius: 25px;
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(10px);
-          font-size: 14px;
-          font-weight: 400;
-          transition: all 0.3s ease;
-          display: inline-block;
-        }
-
-        .submit-button a:hover {
-          background: rgba(255, 255, 255, 0.2);
-          border-color: rgba(255, 255, 255, 0.6);
-        }
+                <style jsx>{`
+            /* DEPRECATED: Old button styles - replaced with .btn system */
+            /*
+            .submit-button { ... }
+            .submit-button a { ... }
+            */
 
         .main-content {
           position: relative;
-          z-index: 10;
+          z-index: 1;
           padding: 60px;
           min-height: 100vh;
           display: flex;
@@ -251,31 +231,27 @@ export default function Page() {
           }
         }
 
-        @media (max-width: 768px) {
-          .main-content {
-            padding: 30px 20px;
-          }
-          
-          .main-text h1,
-          .main-text p {
-            font-size: 28px;
-          }
-          
-          .side-columns {
-            flex-direction: column;
-            gap: 30px;
-          }
-          
-          .submit-button {
-            top: 20px;
-            right: 20px;
-          }
-          
-          .submit-button a {
-            padding: 10px 20px;
-            font-size: 13px;
-          }
-        }
+      @media (max-width: 768px) {
+              .main-content {
+                padding: 30px 20px;
+              }
+              
+              .main-text h1,
+              .main-text p {
+                font-size: 28px;
+              }
+              
+              .side-columns {
+                flex-direction: column;
+                gap: 30px;
+              }
+              
+              /* DEPRECATED: Old submit-button styles */
+              /*
+              .submit-button { ... }
+              .submit-button a { ... }
+              */
+            }
       `}</style>
     </div>
   );

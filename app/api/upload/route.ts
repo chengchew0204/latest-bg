@@ -36,33 +36,35 @@ export async function POST(req: Request) {
       mozjpeg: true,
     }).toBuffer();
 
-    // Build paths
+    // Generate version number (used as part of filename)
+    const version = Date.now();
+    const currentPath = `bg/current/${version}.jpg`;
+
+    // Build backup path
     const now = new Date();
     const yyyy = now.getUTCFullYear();
     const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
     const dd = String(now.getUTCDate()).padStart(2, "0");
     const backupPath = `backups/${yyyy}/${mm}/${dd}/${uuidv4()}.jpg`;
-    const currentPath = "bg/current.jpg";
 
-    // Write 1) public current image (fixed path)
+    // Write 1) current background: unique path with long cache (content won't change)
     const current = await put(currentPath, jpeg, {
       access: "public",
+      addRandomSuffix: false,        // We use version as filename, no need for random suffix
       contentType: "image/jpeg",
-      addRandomSuffix: false, // keep deterministic path
-      allowOverwrite: true, // allow overwriting existing bg/current.jpg
+      cacheControlMaxAge: 31536000,  // 1 year, since this URL will never change content
     });
 
-    // Write 2) private backup
+    // Write 2) backup (non-guessable URL, not exposed publicly)
     await put(backupPath, jpeg, {
       access: "public",
+      addRandomSuffix: true,
       contentType: "image/jpeg",
-      addRandomSuffix: false,
+      cacheControlMaxAge: 31536000,
     });
 
-    // Update KV pointer with a version for cache busting
-    const version = Date.now();
+    // Update KV pointer
     await kv.hset("bg:current", {
-      path: current.pathname,
       url: current.url,
       version: String(version),
       updatedAt: String(version),
