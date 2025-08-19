@@ -10,15 +10,12 @@ export default function PhotoboothPage() {
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [isClient, setIsClient] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
   // Start camera
   const startCamera = useCallback(async () => {
-    if (cameraActive) return; // Prevent multiple calls
-    
     setError(null);
     setCameraActive(true);
     setCameraReady(false);
@@ -40,7 +37,7 @@ export default function PhotoboothPage() {
       setCameraActive(false);
       setCameraReady(false);
     }
-  }, [cameraActive]);
+  }, []); // Remove cameraActive dependency to prevent infinite loop
 
   // Stop camera to release resources
   const stopCamera = useCallback(() => {
@@ -54,19 +51,21 @@ export default function PhotoboothPage() {
     setCameraReady(false);
   }, []);
 
-  // Initialize client-side state
+  // Initialize client-side state and start camera
   useEffect(() => {
-    setIsClient(true);
     setBgVersion(Date.now());
-  }, []);
-
-  // Auto-start camera when client is ready
-  useEffect(() => {
-    if (!isClient) return;
     
-    startCamera();
-    return () => stopCamera();
-  }, [isClient, startCamera, stopCamera]);
+    // Start camera after a short delay to ensure component is ready
+    const timer = setTimeout(() => {
+      startCamera();
+    }, 100);
+    
+    return () => {
+      clearTimeout(timer);
+      stopCamera();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array to run only once
 
   // Capture a frame -> compress -> upload
   const captureAndUpload = async () => {
