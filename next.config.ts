@@ -6,10 +6,10 @@ const nextConfig: NextConfig = {
     // Remove console logs in production
     removeConsole: process.env.NODE_ENV === "production",
   },
-  // Enable experimental features for better SSR
-  experimental: {
-    optimizeCss: true,
-  },
+  // Remove experimental optimizeCss to fix Vercel build issue
+  // experimental: {
+  //   optimizeCss: true,
+  // },
 };
 
 export default nextConfig;
