@@ -84,8 +84,8 @@ export default function Page() {
         <div className="main-content">
           {/* Left side - Main text */}
           <div className="main-text">
-            <h1 className="hover-effect hover-effect--cursor-square" style={{ marginBottom: "-70px" }}>Zack Woo is a Dallas-based artist/coder exploring systems, self-generating processes, and digital Autopoeisis through technology. </h1>
-            <h3 className="hover-effect hover-effect--cursor-square" style={{ position: "relative", top: "60px", maxWidth: "53vw" }}>In addition to his independent work, he collaborates across art and music to create transformative experiences. </h3>
+            <h1 className="hover-effect hover-effect--bg-south" style={{ marginBottom: "-70px" }}>Zack Woo is a Dallas-based artist/coder exploring systems, self-generating processes, and digital Autopoeisis through technology. </h1>
+            <h3 className="hover-effect hover-effect--bg-south" style={{ position: "relative", top: "60px", maxWidth: "53vw" }}>In addition to his independent work, he collaborates across art and music to create transformative experiences. </h3>
           </div>
           
           {/* Right side - Two columns */}
