@@ -13,7 +13,7 @@ body {
   padding: 60px;
   min-height: 100vh;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
 }
 
@@ -21,7 +21,6 @@ body {
   flex: 1;
   max-width: 60%;
   padding-right: 60px;
-  padding-top: 0;
 }
 
 .main-text h1 {
