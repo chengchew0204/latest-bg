@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/Button";
 
 export default function Page() {
   const [bgVersion, setBgVersion] = useState<number>(0);
   const [isClient, setIsClient] = useState(false);
+  const bgVersionRef = useRef<number>(0);
 
   // Initialize client-side state
   useEffect(() => {
@@ -14,6 +15,7 @@ export default function Page() {
     // Check for stored version first, then use current time
     const storedVersion = localStorage.getItem('bg-version');
     const initialVersion = storedVersion ? parseInt(storedVersion, 10) : Date.now();
+    bgVersionRef.current = initialVersion;
     setBgVersion(initialVersion);
   }, []);
 
@@ -24,8 +26,19 @@ export default function Page() {
     const checkForUpdates = () => {
       // Check localStorage for latest version
       const storedVersion = localStorage.getItem('bg-version');
-      const newVersion = storedVersion ? parseInt(storedVersion, 10) : Date.now();
-      setBgVersion(newVersion);
+      
+      // If no stored version, don't update - use the current version
+      if (!storedVersion) {
+        return;
+      }
+      
+      const newVersion = parseInt(storedVersion, 10);
+      
+      // Only update if version actually changed
+      if (newVersion !== bgVersionRef.current) {
+        bgVersionRef.current = newVersion;
+        setBgVersion(newVersion);
+      }
     };
 
     // Update background when page becomes visible (user returns from photobooth)
@@ -40,12 +53,12 @@ export default function Page() {
       checkForUpdates();
     };
 
-    // Check for updates periodically (every 5 seconds when page is visible)
-    const interval = setInterval(() => {
-      if (!document.hidden) {
-        checkForUpdates();
-      }
-    }, 5000);
+    // Remove periodic checking - only check when user returns to page
+    // const interval = setInterval(() => {
+    //   if (!document.hidden) {
+    //     checkForUpdates();
+    //   }
+    // }, 5000);
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleFocus);
@@ -53,7 +66,7 @@ export default function Page() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
-      clearInterval(interval);
+      // clearInterval(interval); // No longer needed
     };
   }, [isClient]);
 
@@ -69,21 +82,18 @@ export default function Page() {
         <div className="main-content">
           {/* Left side - Main text */}
           <div className="main-text">
-            <h1>Zack is a Dallas-based artist and director working with lens-based media. </h1>
-            <p>His practice merges technology and moving image to capture scenes in ways that heighten reality. Alongside his independent work, he collaborates with clients across art and fashion. </p>
+            <h1>Zack is a Dallas-based artist and coder working with lens-based media. </h1>
+            <p style={{ lineHeight: "25px", marginTop: "-30px" }}>His practice merges technology and moving image to capture scenes in ways that heighten reality. Alongside his independent work, he collaborates with clients across art and fashion. </p>
           </div>
           
           {/* Right side - Two columns */}
-          <div className="side-columns">
+          <div className="side-columns" style={{ marginBottom: "65px" }}>
             <div className="column">
               <h3>Selected clients</h3>
               <div className="client-list">
-                Balenciaga<br />
-                Toro y Moi<br />
-                Y-3<br />
-                Nike<br />
-                Dazed<br />
-                Anonymous Club
+                <a href="https://www.camp.mx/" style={{ color: "#fff" }}>camp.mx</a><br />
+                <a href="https://artscilab.utdallas.edu/" style={{ color: "#fff" }}>ArtSciLab@UTD</a><br />
+                <a href="https://over-my-body-next-js-2s2c.vercel.app/" style={{ color: "#fff" }}>OVERMYBODY</a><br />
               </div>
             </div>
             
@@ -146,9 +156,6 @@ export default function Page() {
         }
 
         .main-text p {
-          font-size: 48px;
-          font-weight: 700;
-          line-height: 1.1;
           color: #fff;
           margin: 0;
         }
@@ -221,8 +228,7 @@ export default function Page() {
             padding-right: 0;
           }
           
-          .main-text h1,
-          .main-text p {
+          .main-text h1 {
             font-size: 36px;
           }
           
@@ -236,8 +242,7 @@ export default function Page() {
                 padding: 30px 20px;
               }
               
-              .main-text h1,
-              .main-text p {
+              .main-text h1 {
                 font-size: 28px;
               }
               

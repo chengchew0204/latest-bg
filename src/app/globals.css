@@ -40,3 +40,88 @@ a {
     color-scheme: dark;
   }
 }
+
+/* ---- Headings (h1–h5) ---- */
+/* Responsive sizes use clamp(min, vw, max) for good scaling */
+:root {
+  /* Optional tuning knobs for headings */
+  --heading-color: var(--foreground);
+  --heading-lh: 1.2;
+  --heading-track: -0.01em; /* negative tracking for large sizes */
+}
+
+/* Base style shared by all headings */
+h1, h2, h3, h4, h5 {
+  color: var(--heading-color);
+  line-height: var(--heading-lh);
+  letter-spacing: var(--heading-track);
+  margin-block: 0 0.6em;      /* bottom space only (global reset wiped margins) */
+  font-weight: 700;
+}
+
+/* Individual scales */
+h1 {
+  /* Desktop ≈ 52px, mobile ≈ 32px */
+  font-size: clamp(2rem, 6vw, 3.25rem);
+  font-weight: 800;
+}
+
+h2 {
+  /* Desktop ≈ 40px, mobile ≈ 28px */
+  font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+  font-weight: 750; /* variable, falls back to 700 on non-variable fonts */
+}
+
+h3 {
+  /* Desktop ≈ 32px, mobile ≈ 24px */
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+}
+
+h4 {
+  /* Desktop ≈ 24px, mobile ≈ 20px */
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  font-weight: 600;
+}
+
+h5 {
+  /* Desktop ≈ 18px, mobile ≈ 16px */
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  font-weight: 600;
+  letter-spacing: 0; /* tighter for small text */
+}
+
+/* Optional: reduce top margin when a heading follows another heading */
+h2 + h3, h3 + h4, h4 + h5 {
+  margin-top: -0.2em;
+}
+
+/* ---- Paragraphs (p) ---- */
+/* Readability-first defaults */
+:root {
+  --p-fg: var(--foreground);
+  --p-lh: 1.7;            /* comfortable line-height for body copy */
+  --p-max-width: 72ch;    /* ideal measure: ~60–75 characters per line */
+}
+
+p {
+  color: var(--p-fg);
+  font-size: clamp(1rem, 1.2vw, 1.0625rem); /* ~16px → ~17px on large screens */
+  line-height: var(--p-lh);
+  max-width: var(--p-max-width);
+  margin-block: 0 1em;    /* bottom spacing only (global reset removed margins) */
+}
+
+/* Tighten spacing between consecutive paragraphs */
+p + p { margin-top: 0.5em; }
+
+/* Gentle top margin when a paragraph follows a heading */
+h1 + p { margin-top: 0.4em; }
+h2 + p { margin-top: 0.3em; }
+h3 + p, h4 + p, h5 + p { margin-top: 0.25em; }
+
+/* Optional variants */
+p.lead  { font-size: clamp(1.0625rem, 2vw, 1.25rem); line-height: 1.6; opacity: .92; } /* intro paragraph */
+p.muted { opacity: .72; } /* de-emphasized text */
+
+/* Media inside paragraphs */
+p img { display: inline-block; max-width: 100%; height: auto; vertical-align: middle; }
