@@ -50,7 +50,7 @@ export default function VisitorCounter() {
     borderRadius: 12,
     color: "#fff",
     backdropFilter: "blur(6px)",
-    opacity: isVisible ? 1 : 0,
+    opacity: isVisible ? 0.15 : 0,
     transition: "opacity 0.3s ease-in-out",
     pointerEvents: isVisible ? "auto" : "none",
   };
