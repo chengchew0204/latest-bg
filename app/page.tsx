@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/Button";
-import HoverEffects from "../../components/HoverEffects";
 
 export default function Page() {
   const [bgVersion, setBgVersion] = useState<number>(0);
@@ -73,7 +72,6 @@ export default function Page() {
 
   return (
     <div>
-      <HoverEffects />
       <div id="home">
         {/* Submit background image button */}
         <Button as="a" href="/Photobooth" className="btn--fixed-top-right btn--white-to-black">
@@ -84,8 +82,8 @@ export default function Page() {
         <div className="main-content">
           {/* Left side - Main text */}
           <div className="main-text">
-            <h1 className="hover-effect hover-effect--bg-south" style={{ marginBottom: "-70px", margin: "0 0 -80px 0", fontWeight: "700", zIndex: 10 }}>Zack Woo is a Dallas-based artist/coder <br/>exploring systems, self-generating<br/> processes, and digital Autopoeisis <br/>through technology. </h1>
-            <h3 className="hover-effect hover-effect--bg-south" style={{ position: "relative", top: "60px", maxWidth: "53vw", fontWeight: "700", zIndex: 10 }}>In addition to his independent work,<br/> he collaborates across art and music to create transformative experiences. </h3>
+            <h1 style={{ marginBottom: "-70px" }}>Zack Woo is a Dallas-based artist/coder exploring systems, self-generating processes, and digital Autopoeisis through technology. </h1>
+            <h3 style={{ position: "relative", top: "60px", maxWidth: "53vw" }}>In addition to his independent work, he collaborates across art and music to create transformative experiences. </h3>
           </div>
           
           {/* Right side - Two columns */}
