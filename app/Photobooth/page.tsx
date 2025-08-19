@@ -177,7 +177,7 @@ export default function PhotoboothPage() {
         </Button>
         <div className="right-wrapper">
           {!photoTaken && (
-            <Button onClick={takePhoto} disabled={!cameraReady}>
+            <Button onClick={takePhoto} disabled={!cameraReady} className="btn--white-to-black">
               Take photo
             </Button>
           )}
@@ -187,10 +187,10 @@ export default function PhotoboothPage() {
       {/* Upload/Cancel buttons (only when photo taken) */}
       {photoTaken && (
         <div className="photo-actions-buttons">
-          <Button onClick={uploadPhoto} disabled={busy}>
+          <Button onClick={uploadPhoto} disabled={busy} className="btn--white-to-black">
             {uploadSuccess ? "Success!" : busy ? "Uploading..." : "Upload"}
           </Button>
-          <Button onClick={cancelPhoto} disabled={busy} className="btn--white">
+          <Button onClick={cancelPhoto} disabled={busy} className="btn--black-to-white">
             Cancel
           </Button>
         </div>

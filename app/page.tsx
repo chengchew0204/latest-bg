@@ -61,7 +61,7 @@ export default function Page() {
     <div>
       <div id="home">
         {/* Submit background image button */}
-        <Button as="a" href="/Photobooth" className="btn--fixed-top-right">
+        <Button as="a" href="/Photobooth" className="btn--fixed-top-right btn--white-to-black">
           Submit background image
         </Button>
 
@@ -69,8 +69,8 @@ export default function Page() {
         <div className="main-content">
           {/* Left side - Main text */}
           <div className="main-text">
-            <h1>Jonas Sprattland (formerly Ersland) is a Berlin-based artist and director working with lens-based media.</h1>
-            <p>His work is centred around combining technology and videography to capture scenes, moments and images in ways that amplifies reality. Next to his autonomous art practice he collaborates with clients in the fields of art and fashion.</p>
+            <h1>Zack is a Dallas-based artist and director working with lens-based media. </h1>
+            <p>His practice merges technology and moving image to capture scenes in ways that heighten reality. Alongside his independent work, he collaborates with clients across art and fashion. </p>
           </div>
           
           {/* Right side - Two columns */}
@@ -90,8 +90,8 @@ export default function Page() {
             <div className="column">
               <h3>Contact</h3>
               <div className="contact-list">
-                <a href="https://www.instagram.com/jonas_sprattland/">Instagram</a><br />
-                <a href="mailto:jonasersland@gmail.com">Email</a>
+                <a href="https://www.instagram.com/cov1d.69/">Instagram</a><br />
+                <a href="mailto:chengchew0204@gmail.com">Email</a>
               </div>
             </div>
           </div>

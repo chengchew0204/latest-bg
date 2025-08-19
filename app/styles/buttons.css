@@ -62,18 +62,41 @@
   border-color: #e0e0e0 !important;
 }
 
+/* Specific button color combinations */
+.btn--white-to-black {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+.btn--white-to-black:hover {
+  background: #000 !important;
+  color: #fff !important;
+  border-color: #000 !important;
+}
+
+.btn--black-to-white {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+.btn--black-to-white:hover {
+  background: #fff !important;
+  color: #000 !important;
+  border-color: #fff !important;
+}
+
 /* Layout helpers */
 .btn + .btn { margin-left: 10px; }
-.btn--fixed-top-right { position: fixed; top: 10px; right: 10px; z-index: 999; }
+.btn--fixed-top-right { position: fixed; top: 32px; right: 32px; z-index: 999; }
 
 /* Photobooth specific wrappers (optional) */
 .photobooth-nav-wrapper { 
   display: flex; 
   align-items: center; 
   position: fixed;
-  top: 10px;
-  left: 10px;
-  right: 10px;
+  top: 32px;
+  left: 32px;
+  right: 32px;
   z-index: 999;
   pointer-events: none;
 }
