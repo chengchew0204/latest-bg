@@ -91,6 +91,10 @@ export default function PhotoboothPage() {
       canvas.width = w;
       canvas.height = h;
       const ctx = canvas.getContext("2d")!;
+      
+      // Apply horizontal flip transformation
+      ctx.scale(-1, 1);
+      ctx.translate(-w, 0);
       ctx.drawImage(video, 0, 0, w, h);
 
       // Get image data as base64 for upload
