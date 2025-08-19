@@ -266,6 +266,7 @@ export default function PhotoboothPage() {
           height: 100%;
           object-fit: cover;
           cursor: pointer;
+          transform: scaleX(-1); /* Mirror the camera like a selfie cam */
         }
 
         .camera-placeholder {
