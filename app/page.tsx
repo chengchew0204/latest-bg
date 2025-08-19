@@ -82,8 +82,8 @@ export default function Page() {
         <div className="main-content">
           {/* Left side - Main text */}
           <div className="main-text">
-            <h1>Zack is a Dallas-based artist and coder working with lens-based media. </h1>
-            <p style={{ lineHeight: "25px", marginTop: "-30px" }}>His practice merges technology and moving image to capture scenes in ways that heighten reality. Alongside his independent work, he collaborates with clients across art and music. </p>
+            <h1 style={{ marginBottom: "-70px" }}>Zack Woo is a Dallas-based artist/coder exploring systems, self-generating processes, and digital Autopoeisis through technology. </h1>
+            <h3 style={{ position: "relative", top: "60px", maxWidth: "53vw" }}>In addition to his independent work, he collaborates across art and music to create transformative experiences. </h3>
           </div>
           
           {/* Right side - Two columns */}
