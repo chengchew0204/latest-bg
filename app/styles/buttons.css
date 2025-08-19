@@ -101,6 +101,22 @@
   }
 }
 
+/* Tablet portrait mode - buttons at bottom */
+@media (min-width: 769px) and (max-width: 1024px) and (orientation: portrait) {
+  .btn--fixed-top-right {
+    top: auto;
+    bottom: 32px;
+    right: 32px;
+  }
+  
+  .photobooth-nav-wrapper {
+    top: auto;
+    bottom: 32px;
+    left: 32px;
+    right: 32px;
+  }
+}
+
 /* Photobooth specific wrappers (optional) */
 .photobooth-nav-wrapper { 
   display: flex; 

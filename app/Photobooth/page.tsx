@@ -370,6 +370,24 @@ export default function PhotoboothPage() {
             font-size: 13px;
           }
         }
+
+        /* Tablet portrait mode - buttons at bottom */
+        @media (min-width: 769px) and (max-width: 1024px) and (orientation: portrait) {
+          .photobooth-nav-wrapper {
+            top: auto !important;
+            bottom: 32px !important;
+            left: 32px !important;
+            right: 32px !important;
+          }
+          
+          .photo-actions-buttons {
+            top: auto;
+            bottom: 32px;
+            right: 32px;
+            flex-direction: row;
+            gap: 12px;
+          }
+        }
       `}</style>
     </div>
   );
