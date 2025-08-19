@@ -9,7 +9,6 @@
   cursor: pointer;
   transition: none;
   font-kerning: none;
-  position: relative;
   white-space: nowrap;
 }
 
@@ -31,6 +30,7 @@
   --color-bg-effect: rgba(255, 255, 255, 0.1);
   --blendmode-effect: none;
   --bg-blur: 5px;
+  position: relative;
 }
 
 .hover-effect--bg-south::after {
