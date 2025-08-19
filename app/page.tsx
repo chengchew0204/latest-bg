@@ -1,10 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Page() {
-  const [bgVersion] = useState<number>(Date.now());
+  const [bgVersion, setBgVersion] = useState<number>(Date.now());
+
+  // Check for background updates periodically
+  useEffect(() => {
+    const checkForUpdates = () => {
+      setBgVersion(Date.now());
+    };
+
+    // Update background when page becomes visible (user returns from photobooth)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        checkForUpdates();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   return (
     <div>

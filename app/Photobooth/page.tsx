@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 
 export default function PhotoboothPage() {
@@ -9,12 +9,13 @@ export default function PhotoboothPage() {
   const [error, setError] = useState<string | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
   // Start camera
-  const startCamera = async () => {
+  const startCamera = useCallback(async () => {
     if (cameraActive) return; // Prevent multiple calls
     
     setError(null);
@@ -38,7 +39,7 @@ export default function PhotoboothPage() {
       setCameraActive(false);
       setCameraReady(false);
     }
-  };
+  }, [cameraActive]);
 
   // Stop camera to release resources
   const stopCamera = () => {
@@ -53,15 +54,16 @@ export default function PhotoboothPage() {
   };
 
   useEffect(() => {
-    // Optional: auto-start camera (comment out if undesired)
-    // startCamera();
+    // Auto-start camera when component mounts
+    startCamera();
     return () => stopCamera();
-  }, []);
+  }, [startCamera]);
 
   // Capture a frame -> compress -> upload
   const captureAndUpload = async () => {
     setBusy(true);
     setError(null);
+    setUploadSuccess(false);
     try {
       const video = videoRef.current!;
       if (!video || !cameraReady || !video.videoWidth) {
@@ -96,6 +98,12 @@ export default function PhotoboothPage() {
       // Bump version to bust cache on /bg
       const json = await res.json();
       setBgVersion(json.version ?? Date.now());
+      setUploadSuccess(true);
+      
+      // Show success message and redirect after a delay
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1500);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
@@ -125,7 +133,7 @@ export default function PhotoboothPage() {
       {/* Take photo button */}
       <div className="take-photo-button">
         <button onClick={captureAndUpload} disabled={busy || !cameraReady}>
-          {busy ? "..." : cameraReady ? "Take photo" : "Starting camera..."}
+          {uploadSuccess ? "Success! Redirecting..." : busy ? "Uploading..." : cameraReady ? "Take photo" : "Starting camera..."}
         </button>
       </div>
 
@@ -136,17 +144,11 @@ export default function PhotoboothPage() {
           playsInline
           muted
           className="camera-video"
-          onClick={!cameraActive ? startCamera : undefined}
           style={{ display: cameraActive ? 'block' : 'none' }}
         />
-        {!cameraActive && (
-          <div className="camera-placeholder" onClick={startCamera}>
-            <span>Tap to start camera</span>
-          </div>
-        )}
-        {cameraActive && !cameraReady && (
+        {!cameraReady && (
           <div className="camera-loading">
-            <span>Starting camera...</span>
+            <span>{cameraActive ? 'Starting camera...' : 'Initializing...'}</span>
           </div>
         )}
       </div>
