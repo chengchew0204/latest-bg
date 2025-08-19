@@ -1,6 +1,7 @@
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./styles/buttons.css";
 import "./styles/homepage.css";
+import VisitorCounter from "@/components/VisitorCounter";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </div>
         <SpeedInsights />
+        <VisitorCounter />
       </body>
     </html>
   );
