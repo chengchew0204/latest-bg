@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
     // Read and normalize the image
     const input = Buffer.from(await file.arrayBuffer());
-    let img = sharp(input, { failOnError: false }).rotate();
+    const img = sharp(input, { failOnError: false }).rotate();
     const meta = await img.metadata();
 
     // For current background: resize and compress
