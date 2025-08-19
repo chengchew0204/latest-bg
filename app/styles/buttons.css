@@ -101,6 +101,24 @@
   }
 }
 
+/* Fix for mobile hover state persistence across page navigation */
+@media (max-width: 768px) {
+  .btn--white-to-black {
+    /* Force reset hover state on mobile */
+    background: #fff !important;
+    color: #000 !important;
+    border-color: #fff !important;
+  }
+  
+  /* Only apply hover effects on actual hover/touch */
+  .btn--white-to-black:hover,
+  .btn--white-to-black:active {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #000 !important;
+  }
+}
+
 /* Tablet portrait mode - buttons at bottom */
 @media (min-width: 769px) and (max-width: 1024px) and (orientation: portrait) {
   .btn--fixed-top-right {

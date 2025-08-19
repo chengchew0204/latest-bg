@@ -57,13 +57,31 @@ export default function PhotoboothPage() {
   useEffect(() => {
     setBgVersion(Date.now());
     
+    // Fix mobile hover state persistence issue
+    const resetButtonStates = () => {
+      // Force reset any lingering hover states on mobile
+      const buttons = document.querySelectorAll('.btn--white-to-black');
+      buttons.forEach(btn => {
+        if (btn instanceof HTMLElement) {
+          btn.style.background = '#fff';
+          btn.style.color = '#000';
+          btn.style.borderColor = '#fff';
+        }
+      });
+    };
+    
+    // Reset button states immediately and after a short delay
+    resetButtonStates();
+    const resetTimer = setTimeout(resetButtonStates, 50);
+    
     // Start camera after a short delay to ensure component is ready
-    const timer = setTimeout(() => {
+    const cameraTimer = setTimeout(() => {
       startCamera();
     }, 100);
     
     return () => {
-      clearTimeout(timer);
+      clearTimeout(resetTimer);
+      clearTimeout(cameraTimer);
       stopCamera();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
