@@ -6,7 +6,7 @@ import VisitorCounter from "@/components/VisitorCounter";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-Hant">
+    <html lang="en">
       <body
         style={{
           margin: 0,
