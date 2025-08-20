@@ -159,10 +159,35 @@ export default function PhotoboothPage() {
       }
     };
 
-    // Adjust timeslice based on resolution for optimal chunk size
-    // 4K: 3 seconds (~6-8MB chunks)
-    // 1080p: 4 seconds (~3-4MB chunks) 
-    // 720p: 5 seconds (~2-3MB chunks)
+    // CRITICAL FIX: Don't use timeslice - it creates incomplete chunks without headers
+    // Instead, manually stop/start to create complete, playable video files
+    mr.start(); // Start without timeslice to create complete files
+    
+    // Store the data handler for reuse
+    const dataHandler = mr.ondataavailable;
+    
+    // Create complete video segments manually every 4 seconds
+    const createCompleteSegment = () => {
+      const currentRecorder = recRef.current;
+      if (currentRecorder && currentRecorder.state === "recording" && !stoppingRef.current) {
+        currentRecorder.stop(); // This will trigger ondataavailable with a complete file
+        
+        // Restart recording immediately for next segment
+        setTimeout(() => {
+          if (streamRef.current && !stoppingRef.current) {
+            const newMr = new MediaRecorder(streamRef.current, { mimeType: mime, videoBitsPerSecond: bitrate });
+            recRef.current = newMr;
+            newMr.ondataavailable = dataHandler; // Reuse the same handler
+            newMr.start();
+            
+            // Schedule next segment
+            setTimeout(createCompleteSegment, timeslice);
+          }
+        }, 100);
+      }
+    };
+    
+    // Calculate optimal segment duration
     let timeslice = 4000; // Default 4 seconds
     if (pixels >= 3840 * 2160 * 0.8) {
       timeslice = 3000; // 3 seconds for 4K
@@ -170,7 +195,8 @@ export default function PhotoboothPage() {
       timeslice = 5000; // 5 seconds for 720p and below
     }
     
-    mr.start(timeslice);
+    // Start the first segment cycle
+    setTimeout(createCompleteSegment, timeslice);
   }, []);
 
   // Gracefully stop the recorder and try to flush the final chunk
