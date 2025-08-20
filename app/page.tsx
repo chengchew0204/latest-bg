@@ -91,14 +91,14 @@ export default function Page() {
 
       // Set a small delay to prevent rapid scrolling
       scrollTimeout = setTimeout(() => {
-        if (distanceFromBottom <= 200) {
-          // Scroll to bottom when cursor is within 200px of bottom
+        if (distanceFromBottom <= 300) {
+          // Scroll to bottom when cursor is within 300px of bottom
           window.scrollTo({
             top: document.documentElement.scrollHeight,
             behavior: 'smooth'
           });
         } else {
-          // Scroll to top when cursor is outside the 200px zone
+          // Scroll to top when cursor is outside the 300px zone
           window.scrollTo({
             top: 0,
             behavior: 'smooth'
