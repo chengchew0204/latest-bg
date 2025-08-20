@@ -31,7 +31,7 @@ export default function PhotoboothPage() {
       "video/webm"
     ];
     for (const m of cands) {
-      if (typeof window !== "undefined" && (window as any).MediaRecorder && (window as any).MediaRecorder.isTypeSupported(m)) {
+      if (typeof window !== "undefined" && window.MediaRecorder && window.MediaRecorder.isTypeSupported(m)) {
         return m;
       }
     }
@@ -39,7 +39,7 @@ export default function PhotoboothPage() {
   };
 
   // Start recording video backup
-  const startRecording = (stream: MediaStream) => {
+  const startRecording = useCallback((stream: MediaStream) => {
     const mime = pickMime();
     recordingSupportedRef.current = !!mime;
     if (!mime) return;
@@ -99,7 +99,7 @@ export default function PhotoboothPage() {
     }
     
     mr.start(timeslice);
-  };
+  }, []);
 
   // Gracefully stop the recorder and try to flush the final chunk
   const stopRecordingAndFlush = () => {
@@ -159,7 +159,7 @@ export default function PhotoboothPage() {
       setCameraActive(false);
       setCameraReady(false);
     }
-  }, []); // Remove cameraActive dependency to prevent infinite loop
+  }, [startRecording]); // Add startRecording dependency
 
   // Stop camera to release resources
   const stopCamera = useCallback(() => {

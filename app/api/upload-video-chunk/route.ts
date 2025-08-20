@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ ok: true, url: res.url, pathname: res.pathname });
-  } catch (e: any) {
-    return new NextResponse(e?.message ?? "upload failed", { status: 500 });
+  } catch (e: unknown) {
+    return new NextResponse(e instanceof Error ? e.message : "upload failed", { status: 500 });
   }
 }
