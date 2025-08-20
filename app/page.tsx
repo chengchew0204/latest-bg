@@ -79,11 +79,7 @@ export default function Page() {
     const isDesktop = window.innerWidth > 768;
     if (!isDesktop) return;
 
-    let scrollTimeout: NodeJS.Timeout;
-
     const handleMouseMove = (e: MouseEvent) => {
-      // Clear previous timeout
-      clearTimeout(scrollTimeout);
 
       // Get viewport dimensions
       const viewportHeight = window.innerHeight;
@@ -115,7 +111,6 @@ export default function Page() {
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
-      clearTimeout(scrollTimeout);
     };
   }, [isClient]);
 
