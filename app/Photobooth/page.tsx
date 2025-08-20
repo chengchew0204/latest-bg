@@ -23,7 +23,16 @@ export default function PhotoboothPage() {
     setCameraReady(false);
     
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      // Request high quality video stream with specific constraints
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: {
+          width: { ideal: 1920, max: 3840 },  // Request up to 4K resolution
+          height: { ideal: 1080, max: 2160 }, // Request up to 4K resolution
+          frameRate: { ideal: 30, max: 60 },  // High frame rate for better quality
+          facingMode: 'user'                  // Front-facing camera
+        }, 
+        audio: false 
+      });
       streamRef.current = stream;
       const v = videoRef.current!;
       v.srcObject = stream;
@@ -128,13 +137,17 @@ export default function PhotoboothPage() {
       canvas.height = h;
       const ctx = canvas.getContext("2d")!;
       
+      // Set high quality rendering settings
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      
       // Apply horizontal flip transformation
       ctx.scale(-1, 1);
       ctx.translate(-w, 0);
       ctx.drawImage(video, 0, 0, w, h);
 
-      // Get image data as base64 for upload
-      const imageData = canvas.toDataURL("image/jpeg", 0.85);
+      // Get image data as base64 for upload with high quality
+      const imageData = canvas.toDataURL("image/jpeg", 0.95);
       setCapturedImageData(imageData);
       setPhotoTaken(true);
     } catch (e: unknown) {
