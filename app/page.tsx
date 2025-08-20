@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/Button";
 
 export default function Page() {
-  const [bgVersion, setBgVersion] = useState<number>(0);
+  const [bgVersion, setBgVersion] = useState<number | null>(null);
   const [isClient, setIsClient] = useState(false);
   const bgVersionRef = useRef<number>(0);
 
@@ -163,17 +163,19 @@ export default function Page() {
         {/* Background wrapper */}
         <div className="backgroundWrapper">
           <div className="background-cover"></div>
-          <div 
-            className="sc-gsTEea lkvHic"
-            style={{
-              position: "fixed",
-              inset: 0,
-              backgroundImage: `url(/bg?v=${bgVersion})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              zIndex: -1,
-            }}
-          ></div>
+          {bgVersion !== null && (
+            <div 
+              className="sc-gsTEea lkvHic"
+              style={{
+                position: "fixed",
+                inset: 0,
+                backgroundImage: `url(/bg?v=${bgVersion})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                zIndex: -1,
+              }}
+            ></div>
+          )}
         </div>
       </div>
 
