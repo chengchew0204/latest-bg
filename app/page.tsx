@@ -70,6 +70,52 @@ export default function Page() {
     };
   }, [isClient]);
 
+  // Desktop auto-scroll functionality
+  useEffect(() => {
+    if (!isClient) return;
+
+    // Only apply on desktop (screen width > 768px)
+    const isDesktop = window.innerWidth > 768;
+    if (!isDesktop) return;
+
+    let scrollTimeout: NodeJS.Timeout;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      // Clear previous timeout
+      clearTimeout(scrollTimeout);
+
+      // Get viewport dimensions
+      const viewportHeight = window.innerHeight;
+      const mouseY = e.clientY;
+      const distanceFromBottom = viewportHeight - mouseY;
+
+      // Set a small delay to prevent rapid scrolling
+      scrollTimeout = setTimeout(() => {
+        if (distanceFromBottom <= 200) {
+          // Scroll to bottom when cursor is within 200px of bottom
+          window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: 'smooth'
+          });
+        } else {
+          // Scroll to top when cursor is outside the 200px zone
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+    };
+
+    // Add event listener
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      clearTimeout(scrollTimeout);
+    };
+  }, [isClient]);
+
   return (
     <div>
       <div id="home">
