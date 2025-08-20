@@ -90,7 +90,7 @@ export default function Page() {
               >
                 digital Autopoiesis
               </a> through technology. </h1>
-            <h3 className="subtitle-text" style={{ position: "relative", top: "55px", maxWidth: "55vw", fontWeight: "350" }}>In addition to his independent work, he collaborates across art and music to create transformative web experiences. </h3>
+            <h3 className="subtitle-text" style={{ position: "relative", top: "55px", maxWidth: "55vw", fontWeight: "350" }}>In addition to his independent work, he collaborates across art and music to create transformative experiences. </h3>
           </div>
           
           {/* Right side - Two columns */}
