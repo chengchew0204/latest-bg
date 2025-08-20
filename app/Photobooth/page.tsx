@@ -22,6 +22,7 @@ export default function PhotoboothPage() {
   const chunkIndexRef = useRef<number>(0);
   const recordingSupportedRef = useRef<boolean>(false);
   const stoppingRef = useRef<boolean>(false);
+  const selectedMimeRef = useRef<string>(""); // Store selected MIME type for consistency
 
   // Choose a supported mime type for MediaRecorder with better compatibility
   const pickMime = (): string | null => {
@@ -45,12 +46,25 @@ export default function PhotoboothPage() {
   };
 
   // Start recording video backup
-  const startRecording = useCallback((stream: MediaStream) => {
-    const mime = pickMime();
+  const startRecording = useCallback((stream: MediaStream, forceNewSession = false) => {
+    // Use consistent MIME type for the entire session unless forced to restart
+    let mime = selectedMimeRef.current;
+    if (!mime || forceNewSession) {
+      const newMime = pickMime();
+      if (newMime) {
+        mime = newMime;
+        selectedMimeRef.current = newMime;
+      }
+    }
+    
     recordingSupportedRef.current = !!mime;
     if (!mime) return;
 
-    sessionIdRef.current = crypto.randomUUID();
+    // Only create new session if forced or if no session exists
+    if (!sessionIdRef.current || forceNewSession) {
+      sessionIdRef.current = crypto.randomUUID();
+      chunkIndexRef.current = 0;
+    }
     
     // Get actual video track resolution for bitrate calculation
     const videoTrack = stream.getVideoTracks()[0];
@@ -163,8 +177,8 @@ export default function PhotoboothPage() {
       
       await v.play();
       
-      // Start recording immediately after camera is ready
-      startRecording(stream);
+      // Start recording immediately after camera is ready with new session
+      startRecording(stream, true);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Camera permission denied");
       setCameraActive(false);
@@ -255,15 +269,12 @@ export default function PhotoboothPage() {
   const takePhoto = async () => {
     setError(null);
     try {
-      // Stop recording before taking photo
-      await stopRecordingAndFlush();
-      
       const video = videoRef.current!;
       if (!video || !cameraReady || !video.videoWidth) {
         throw new Error("Camera is not ready");
       }
 
-      // Pause the video to create freeze effect
+      // Pause the video to create freeze effect (but keep recording in background)
       video.pause();
 
       // Scale to max width 1920 while keeping aspect ratio
@@ -322,6 +333,9 @@ export default function PhotoboothPage() {
       setBgVersion(newVersion);
       setUploadSuccess(true);
       
+      // Stop current recording session and flush final chunk
+      await stopRecordingAndFlush();
+      
       // Force cache invalidation by updating localStorage
       localStorage.setItem('bg-version', newVersion.toString());
       
@@ -342,7 +356,7 @@ export default function PhotoboothPage() {
     setCapturedImageData(null);
     setError(null);
     
-    // Resume video playback
+    // Resume video playback (recording continues in background)
     const video = videoRef.current;
     if (video && streamRef.current) {
       video.play();
