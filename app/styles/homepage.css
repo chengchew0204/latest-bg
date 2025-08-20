@@ -139,5 +139,6 @@ body {
     top: 100px !important;
     max-width: 37vw !important;
     font-weight: 350 !important;
+    white-space: normal !important;
   }
 }
