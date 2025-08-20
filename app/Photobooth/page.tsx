@@ -35,43 +35,47 @@ export default function PhotoboothPage() {
 
     //console.log('Platform detection:', { isIOS, isSafari, isAndroid, isChrome, isFirefox });
 
-    // REALITY-TESTED codec candidates - only formats that actually work reliably
+    // 2025/08 CORRECT MediaRecorder support - all major browsers support both formats
     const cands = [
-      // WebM formats - widely supported in Chrome/Firefox/Edge
-      "video/webm;codecs=vp9,opus",           // VP9 + audio (Chrome, Firefox, Edge)
-      "video/webm;codecs=vp9",                // VP9 video only (better compatibility)
-      "video/webm;codecs=vp8,opus",           // VP8 + audio (older but stable)
+      // MP4 formats - supported by ALL major browsers (Chrome, Firefox, Safari, Edge)
+      "video/mp4;codecs=avc1.42E01E,mp4a.40.2", // H.264 baseline + AAC (universal support)
+      "video/mp4;codecs=avc1.42E01E",         // H.264 baseline video only
+      "video/mp4",                            // Basic MP4 (most compatible)
+      
+      // WebM formats - excellent support in Chrome/Firefox/Edge, Safari 17.4+ on iOS
+      "video/webm;codecs=vp9,opus",           // VP9 + audio (high quality)
+      "video/webm;codecs=vp9",                // VP9 video only
+      "video/webm;codecs=vp8,opus",           // VP8 + audio (stable fallback)
       "video/webm;codecs=vp8",                // VP8 video only
       "video/webm",                           // Basic WebM fallback
-      
-      // MP4 formats - ONLY for Safari/iOS (Chrome/Firefox MediaRecorder doesn't support MP4)
-      "video/mp4;codecs=avc1.42E01E,mp4a.40.2", // H.264 baseline + AAC (Safari/iOS only)
-      "video/mp4;codecs=avc1.42E01E",         // H.264 baseline video only (Safari/iOS only)
-      "video/mp4",                            // Basic MP4 (Safari/iOS only)
     ];
 
-    // Platform-specific reordering based on ACTUAL MediaRecorder support
+    // Platform-specific optimization (all browsers support both MP4 and WebM)
     let optimizedCands = [...cands];
     
     if (isIOS || isSafari) {
-      // Safari/iOS: ONLY browser that supports MP4 in MediaRecorder
+      // Safari/iOS: Prefer MP4 H.264 (hardware acceleration), WebM since iOS 17.4
       optimizedCands = [
-        "video/mp4;codecs=avc1.42E01E,mp4a.40.2",
+        "video/mp4;codecs=avc1.42E01E,mp4a.40.2",  // Best performance on Apple devices
         "video/mp4;codecs=avc1.42E01E",
         "video/mp4",
-        "video/webm;codecs=vp9",    // Fallback to WebM if available
-        "video/webm;codecs=vp8",
-        "video/webm"
-      ];
-    } else {
-      // Chrome/Firefox/Edge: NO MP4 support in MediaRecorder, WebM only
-      optimizedCands = [
-        "video/webm;codecs=vp9,opus",
+        "video/webm;codecs=vp9,opus",              // Available since iOS 17.4
         "video/webm;codecs=vp9",
         "video/webm;codecs=vp8,opus",
         "video/webm;codecs=vp8",
         "video/webm"
-        // NO MP4 formats - they will fail even if isTypeSupported() returns true
+      ];
+    } else {
+      // Chrome/Firefox/Edge: Prefer WebM (better compression), MP4 as universal fallback
+      optimizedCands = [
+        "video/webm;codecs=vp9,opus",              // Best quality/compression
+        "video/webm;codecs=vp9",
+        "video/webm;codecs=vp8,opus",
+        "video/webm;codecs=vp8",
+        "video/webm",
+        "video/mp4;codecs=avc1.42E01E,mp4a.40.2",  // Universal compatibility
+        "video/mp4;codecs=avc1.42E01E",
+        "video/mp4"
       ];
     }
 
