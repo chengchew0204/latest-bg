@@ -23,15 +23,21 @@ export default function PhotoboothPage() {
   const recordingSupportedRef = useRef<boolean>(false);
   const stoppingRef = useRef<boolean>(false);
 
-  // Choose a supported mime type for MediaRecorder
+  // Choose a supported mime type for MediaRecorder with better compatibility
   const pickMime = (): string | null => {
     const cands = [
-      "video/webm;codecs=vp9,opus",
-      "video/webm;codecs=vp8,opus",
-      "video/webm"
+      "video/webm;codecs=vp9",        // VP9 without audio for better compatibility
+      "video/webm;codecs=vp8",        // VP8 without audio
+      "video/webm;codecs=h264",       // H.264 in WebM container (if supported)
+      "video/mp4;codecs=avc1.42E01E", // H.264 baseline profile (mobile friendly)
+      "video/mp4",                    // Fallback MP4
+      "video/webm;codecs=vp9,opus",   // VP9 with audio
+      "video/webm;codecs=vp8,opus",   // VP8 with audio
+      "video/webm"                    // Basic WebM
     ];
     for (const m of cands) {
       if (typeof window !== "undefined" && window.MediaRecorder && window.MediaRecorder.isTypeSupported(m)) {
+        console.log(`Selected MIME type: ${m}`);
         return m;
       }
     }
@@ -76,9 +82,14 @@ export default function PhotoboothPage() {
       if (!ev.data || ev.data.size === 0) return;
       try {
         const form = new FormData();
-        form.append("file", ev.data, `part-${chunkIndexRef.current}.webm`);
+        
+        // Determine file extension based on MIME type
+        const fileExt = mime.includes("mp4") ? "mp4" : "webm";
+        form.append("file", ev.data, `part-${chunkIndexRef.current}.${fileExt}`);
         form.append("session", sessionIdRef.current);
         form.append("idx", String(chunkIndexRef.current));
+        form.append("mimeType", mime); // Include MIME type for server processing
+        
         chunkIndexRef.current += 1;
         // fire-and-forget upload; resilient due to chunking
         fetch("/api/upload-video-chunk", { method: "POST", body: form }).catch(() => {});

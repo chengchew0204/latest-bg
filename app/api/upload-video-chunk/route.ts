@@ -10,6 +10,7 @@ export async function POST(req: Request) {
     const file = form.get("file");
     const session = String(form.get("session") || "");
     const idx = String(form.get("idx") || "");
+    const mimeType = String(form.get("mimeType") || "video/webm");
 
     if (!file || !(file instanceof File)) {
       return new NextResponse("missing file", { status: 400 });
@@ -30,12 +31,25 @@ export async function POST(req: Request) {
     const dd = String(now.getUTCDate()).padStart(2, "0");
 
     const buf = Buffer.from(await file.arrayBuffer());
-    const pathname = `backups/videos/${yyyy}/${mm}/${dd}/${session}/${idx}.webm`;
+    
+    // Determine file extension and content type based on MIME type
+    let fileExtension = "webm";
+    let contentType = "video/webm";
+    
+    if (mimeType.includes("mp4")) {
+      fileExtension = "mp4";
+      contentType = "video/mp4";
+    } else if (mimeType.includes("webm")) {
+      fileExtension = "webm";
+      contentType = "video/webm";
+    }
+    
+    const pathname = `backups/videos/${yyyy}/${mm}/${dd}/${session}/${idx}.${fileExtension}`;
 
     const res = await put(pathname, buf, {
       access: "public",           // Vercel Blob objects are public-by-URL
       addRandomSuffix: false,     // deterministic order by index
-      contentType: "video/webm",
+      contentType: contentType,
       cacheControlMaxAge: 31536000,
     });
 
