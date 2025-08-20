@@ -36,37 +36,19 @@ export async function POST(req: Request) {
     let fileExtension = "webm";
     let contentType = "video/webm";
     
-    // More comprehensive MIME type detection
+    // Realistic MIME type detection - only formats MediaRecorder actually produces
     if (mimeType.includes("mp4")) {
+      // MP4 only from Safari/iOS MediaRecorder
       fileExtension = "mp4";
       contentType = "video/mp4";
     } else if (mimeType.includes("webm")) {
+      // WebM from Chrome/Firefox/Edge MediaRecorder
       fileExtension = "webm";
       contentType = "video/webm";
-    } else if (mimeType.includes("matroska") || mimeType.includes("x-matroska")) {
-      fileExtension = "mkv";
-      contentType = "video/x-matroska";
-    } else if (mimeType.includes("quicktime")) {
-      fileExtension = "mov";
-      contentType = "video/quicktime";
-    } else if (mimeType.includes("avi")) {
-      fileExtension = "avi";
-      contentType = "video/x-msvideo";
     } else {
-      // Default fallback based on container format detection
-      if (mimeType.startsWith("video/")) {
-        const parts = mimeType.split(";")[0].split("/");
-        if (parts.length > 1) {
-          const format = parts[1];
-          if (format === "mp4" || format === "x-mp4") {
-            fileExtension = "mp4";
-            contentType = "video/mp4";
-          } else if (format === "webm") {
-            fileExtension = "webm";
-            contentType = "video/webm";
-          }
-        }
-      }
+      // Default to WebM since it's the most common MediaRecorder output
+      fileExtension = "webm";
+      contentType = "video/webm";
     }
     
     console.log(`Processing video chunk: ${mimeType} -> ${fileExtension} (${contentType})`);

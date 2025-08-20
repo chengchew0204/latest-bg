@@ -33,98 +33,58 @@ export default function PhotoboothPage() {
     const isChrome = /Chrome/.test(navigator.userAgent);
     const isFirefox = /Firefox/.test(navigator.userAgent);
 
-    console.log('Platform detection:', { isIOS, isSafari, isAndroid, isChrome, isFirefox });
+    //console.log('Platform detection:', { isIOS, isSafari, isAndroid, isChrome, isFirefox });
 
-    // Comprehensive codec candidates with platform optimization
+    // REALITY-TESTED codec candidates - only formats that actually work reliably
     const cands = [
-      // High-end codecs (best quality, newer browsers)
-      "video/webm;codecs=vp9,opus",           // VP9 with audio (Chrome, Firefox)
+      // WebM formats - widely supported in Chrome/Firefox/Edge
+      "video/webm;codecs=vp9,opus",           // VP9 + audio (Chrome, Firefox, Edge)
       "video/webm;codecs=vp9",                // VP9 video only (better compatibility)
-      "video/webm;codecs=av01.0.08M.08",      // AV1 (cutting edge, Chrome 70+)
-      
-      // H.264 variants (excellent compatibility)
-      "video/mp4;codecs=avc1.42E01E,mp4a.40.2", // H.264 baseline + AAC (mobile friendly)
-      "video/mp4;codecs=avc1.42E01E",         // H.264 baseline video only
-      "video/mp4;codecs=avc1.4D401E,mp4a.40.2", // H.264 main profile + AAC
-      "video/mp4;codecs=avc1.4D401E",         // H.264 main profile video only
-      "video/mp4;codecs=avc1.64001E,mp4a.40.2", // H.264 high profile + AAC
-      "video/mp4;codecs=avc1.64001E",         // H.264 high profile video only
-      
-      // WebM with VP8 (older but widely supported)
-      "video/webm;codecs=vp8,opus",           // VP8 with audio
+      "video/webm;codecs=vp8,opus",           // VP8 + audio (older but stable)
       "video/webm;codecs=vp8",                // VP8 video only
+      "video/webm",                           // Basic WebM fallback
       
-      // H.265/HEVC (newer, better compression, limited support)
-      "video/mp4;codecs=hvc1.1.6.L93.B0,mp4a.40.2", // HEVC main + AAC
-      "video/mp4;codecs=hvc1.1.6.L93.B0",     // HEVC main profile
-      "video/mp4;codecs=hev1.1.6.L93.B0,mp4a.40.2", // HEVC alternative
-      "video/mp4;codecs=hev1.1.6.L93.B0",     // HEVC alternative
-      
-      // WebM with H.264 (experimental, limited support)
-      "video/webm;codecs=h264,opus",          // H.264 in WebM with audio
-      "video/webm;codecs=h264",               // H.264 in WebM
-      
-      // Basic fallbacks
-      "video/mp4",                            // Basic MP4
-      "video/webm",                           // Basic WebM
-      
-      // Legacy/experimental
-      "video/x-matroska;codecs=avc1.42E01E",  // MKV container (rare)
+      // MP4 formats - ONLY for Safari/iOS (Chrome/Firefox MediaRecorder doesn't support MP4)
+      "video/mp4;codecs=avc1.42E01E,mp4a.40.2", // H.264 baseline + AAC (Safari/iOS only)
+      "video/mp4;codecs=avc1.42E01E",         // H.264 baseline video only (Safari/iOS only)
+      "video/mp4",                            // Basic MP4 (Safari/iOS only)
     ];
 
-    // Platform-specific reordering for optimal codec selection
+    // Platform-specific reordering based on ACTUAL MediaRecorder support
     let optimizedCands = [...cands];
     
     if (isIOS || isSafari) {
-      // iOS/Safari prefer H.264 in MP4
+      // Safari/iOS: ONLY browser that supports MP4 in MediaRecorder
       optimizedCands = [
         "video/mp4;codecs=avc1.42E01E,mp4a.40.2",
         "video/mp4;codecs=avc1.42E01E",
-        "video/mp4;codecs=avc1.4D401E,mp4a.40.2",
-        "video/mp4;codecs=avc1.4D401E",
         "video/mp4",
-        ...cands.filter(c => !c.includes('mp4;codecs=avc1'))
-      ];
-    } else if (isAndroid) {
-      // Android devices often support both, but H.264 is more reliable
-      optimizedCands = [
-        "video/mp4;codecs=avc1.42E01E,mp4a.40.2",
-        "video/mp4;codecs=avc1.42E01E",
-        "video/webm;codecs=vp9",
+        "video/webm;codecs=vp9",    // Fallback to WebM if available
         "video/webm;codecs=vp8",
-        ...cands.filter(c => !c.includes('avc1.42E01E') && !c.includes('vp9') && !c.includes('vp8'))
+        "video/webm"
       ];
-    } else if (isChrome) {
-      // Chrome has excellent WebM support
-      optimizedCands = [
-        "video/webm;codecs=vp9,opus",
-        "video/webm;codecs=vp9",
-        "video/webm;codecs=av01.0.08M.08",
-        "video/mp4;codecs=avc1.42E01E,mp4a.40.2",
-        ...cands.filter(c => !c.includes('vp9') && !c.includes('av01') && !c.includes('avc1.42E01E'))
-      ];
-    } else if (isFirefox) {
-      // Firefox has good WebM support but limited H.264
+    } else {
+      // Chrome/Firefox/Edge: NO MP4 support in MediaRecorder, WebM only
       optimizedCands = [
         "video/webm;codecs=vp9,opus",
         "video/webm;codecs=vp9",
         "video/webm;codecs=vp8,opus",
         "video/webm;codecs=vp8",
-        "video/mp4;codecs=avc1.42E01E",
-        ...cands.filter(c => !c.includes('webm;codecs=vp') && !c.includes('avc1.42E01E'))
+        "video/webm"
+        // NO MP4 formats - they will fail even if isTypeSupported() returns true
       ];
     }
 
     // Test each codec and return the first supported one
     for (const m of optimizedCands) {
       if (typeof window !== "undefined" && window.MediaRecorder && window.MediaRecorder.isTypeSupported(m)) {
-        console.log(`✅ Selected MIME type: ${m}`);
-        console.log(`Platform: ${isIOS ? 'iOS' : isAndroid ? 'Android' : isChrome ? 'Chrome' : isFirefox ? 'Firefox' : isSafari ? 'Safari' : 'Other'}`);
+       // console.log(`✅ Selected MIME type: ${m}`);
+       // console.log(`Platform: ${isIOS ? 'iOS' : isAndroid ? 'Android' : isChrome ? 'Chrome' : isFirefox ? 'Firefox' : isSafari ? 'Safari' : 'Other'}`);
         return m;
       }
     }
     
-    console.warn('❌ No supported MIME types found');
+    //console.warn('❌ No supported MIME types found');
     return null;
   };
 
