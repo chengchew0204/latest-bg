@@ -65,12 +65,14 @@ export async function POST(req: Request) {
     });
 
     // Write 2) backup (non-guessable URL, not exposed publicly, maximum quality)
-    await put(backupPath, backupBuffer, {
+    const backup = await put(backupPath, backupBuffer, {
       access: "public",
       addRandomSuffix: true,
       contentType: "image/jpeg",
       cacheControlMaxAge: 31536000,
     });
+
+    console.log(`Backup created: ${backupPath} -> ${backup.url}`);
 
     // Update KV pointer
     await kv.hset("bg:current", {
