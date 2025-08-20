@@ -382,7 +382,10 @@ export default function PhotoboothPage() {
           }
           
           .error-overlay {
-            bottom: 20px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            bottom: auto;
             padding: 14px 28px;
             min-width: 180px;
             font-size: 13px;
