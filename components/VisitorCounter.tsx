@@ -7,6 +7,7 @@ export default function VisitorCounter() {
   const [uv, setUv] = useState<number | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -23,6 +24,11 @@ export default function VisitorCounter() {
   }, []);
 
   useEffect(() => {
+    // 檢查是否為手機裝置
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
     const handleScroll = () => {
       const scrollTop = window.scrollY;
       const windowHeight = window.innerHeight;
@@ -33,10 +39,17 @@ export default function VisitorCounter() {
       setIsVisible(scrollTop + windowHeight >= documentHeight - threshold);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // 初始檢查
+    // 初始檢查
+    checkMobile();
+    handleScroll();
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
   const box: React.CSSProperties = {
@@ -53,6 +66,8 @@ export default function VisitorCounter() {
     opacity: isVisible ? 0.15 : 0,
     transition: "opacity 0.3s ease-in-out",
     pointerEvents: isVisible ? "auto" : "none",
+    // 在手機上隱藏計數器
+    display: isMobile ? "none" : "block",
   };
 
   return (
