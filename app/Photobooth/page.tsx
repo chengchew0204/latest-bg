@@ -57,22 +57,38 @@ export default function PhotoboothPage() {
   useEffect(() => {
     setBgVersion(Date.now());
     
-    // Fix mobile hover state persistence issue
+    // Fix mobile hover state persistence issue - specifically for Take Photo button
     const resetButtonStates = () => {
-      // Force reset any lingering hover states on mobile
+      // Check if on mobile device
+      const isMobile = window.innerWidth <= 768;
+      if (!isMobile) return;
+      
+      // Force reset any lingering hover states on mobile, especially Take Photo button
       const buttons = document.querySelectorAll('.btn--white-to-black');
       buttons.forEach(btn => {
         if (btn instanceof HTMLElement) {
-          btn.style.background = '#fff';
-          btn.style.color = '#000';
-          btn.style.borderColor = '#fff';
+          // Remove any existing inline styles that might persist
+          btn.style.removeProperty('background');
+          btn.style.removeProperty('color');
+          btn.style.removeProperty('border-color');
+          
+          // Force reset to default state
+          btn.style.background = '#fff !important';
+          btn.style.color = '#000 !important';
+          btn.style.borderColor = '#fff !important';
+          
+          // Remove any hover classes that might be stuck
+          btn.classList.remove('hover');
+          btn.blur(); // Remove focus state
         }
       });
     };
     
-    // Reset button states immediately and after a short delay
+    // Reset button states immediately and multiple times for mobile reliability
     resetButtonStates();
-    const resetTimer = setTimeout(resetButtonStates, 50);
+    const resetTimer1 = setTimeout(resetButtonStates, 50);
+    const resetTimer2 = setTimeout(resetButtonStates, 150);
+    const resetTimer3 = setTimeout(resetButtonStates, 300);
     
     // Start camera after a short delay to ensure component is ready
     const cameraTimer = setTimeout(() => {
@@ -80,7 +96,9 @@ export default function PhotoboothPage() {
     }, 100);
     
     return () => {
-      clearTimeout(resetTimer);
+      clearTimeout(resetTimer1);
+      clearTimeout(resetTimer2);
+      clearTimeout(resetTimer3);
       clearTimeout(cameraTimer);
       stopCamera();
     };

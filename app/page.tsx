@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 export default function Page() {
   const [bgVersion, setBgVersion] = useState<number | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [isNearBottom, setIsNearBottom] = useState(false);
   const bgVersionRef = useRef<number>(0);
 
   // Initialize client-side state
@@ -89,22 +90,24 @@ export default function Page() {
       const mouseY = e.clientY;
       const distanceFromBottom = viewportHeight - mouseY;
 
-      // Set a small delay to prevent rapid scrolling
-      scrollTimeout = setTimeout(() => {
-        if (distanceFromBottom <= 300) {
-          // Scroll to bottom when cursor is within 300px of bottom
-          window.scrollTo({
-            top: document.documentElement.scrollHeight,
-            behavior: 'smooth'
-          });
-        } else {
-          // Scroll to top when cursor is outside the 300px zone
-          window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
+      // Update background zoom state and scroll simultaneously
+      const nearBottom = distanceFromBottom <= 300;
+      setIsNearBottom(nearBottom);
+
+      // Scroll immediately with the background zoom (no delay)
+      if (nearBottom) {
+        // Scroll to bottom when cursor is within 300px of bottom
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth'
+        });
+      } else {
+        // Scroll to top when cursor is outside the 300px zone
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
     };
 
     // Add event listener
@@ -173,6 +176,8 @@ export default function Page() {
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 zIndex: -1,
+                transform: isNearBottom ? "scale(1.1)" : "scale(1)",
+                transition: "transform 0.6s ease-out",
               }}
             ></div>
           )}
