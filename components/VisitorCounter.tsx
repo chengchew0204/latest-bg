@@ -54,8 +54,8 @@ export default function VisitorCounter() {
 
   const box: React.CSSProperties = {
     position: "fixed",
-    right: 16,
-    bottom: 16,
+    right: 5,
+    bottom: 5,
     zIndex: 9999,
     fontSize: 12,
     lineHeight: 1.2,
@@ -63,7 +63,7 @@ export default function VisitorCounter() {
     borderRadius: 12,
     color: "#fff",
     backdropFilter: "blur(6px)",
-    opacity: isVisible ? 0.15 : 0,
+    opacity: isVisible ? 0.1 : 0,
     transition: "opacity 0.3s ease-in-out",
     pointerEvents: isVisible ? "auto" : "none",
     // 在手機上隱藏計數器
